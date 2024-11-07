@@ -17,7 +17,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import java.text.NumberFormat
 import java.util.Locale
@@ -54,4 +56,38 @@ fun FibonacciDemoNoBgThrd() {
 
 fun fibonacci(n: Long): Long {
     return if (n <= 1) n else fibonacci(n - 1) + fibonacci(n - 2)
+}
+
+
+@Composable
+fun FibonacciDemoWithCoroutine(){
+    var answer by remember { mutableStateOf("") }
+    var textInput by remember { mutableStateOf("40") }
+    var coroutineScope = rememberCoroutineScope()
+
+    Column {
+        Spacer(modifier = Modifier.height(10.dp))
+        Row {
+            TextField(
+                value = textInput,
+                onValueChange = { textInput = it },
+                label = { Text("Number?") },
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Number
+                )
+            )
+            Button(onClick = {
+                val fibJob = coroutineScope.launch(Dispatchers.Default) {
+                    val num = textInput.toLongOrNull() ?: 0
+                    val fibNumber = fibonacci(num)
+                    answer = NumberFormat.getNumberInstance(Locale.US).format(fibNumber)
+                }
+            }) {
+                Text("Fibonacci")
+            }
+        }
+
+        Text("Result: $answer")
+    }
 }
