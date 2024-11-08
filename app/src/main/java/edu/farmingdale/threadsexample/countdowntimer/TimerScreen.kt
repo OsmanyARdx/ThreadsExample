@@ -9,9 +9,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
@@ -43,8 +45,8 @@ fun TimerScreen(
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Box(
             modifier = modifier
-                .padding(20.dp)
-                .size(240.dp),
+                .fillMaxWidth()
+                .padding(50.dp),
             contentAlignment = Alignment.Center
         ) {
             if (timerViewModel.isRunning) {
@@ -52,7 +54,7 @@ fun TimerScreen(
             }
             Text(
                 text = timerText(timerViewModel.remainingMillis),
-                fontSize = 40.sp,
+                fontSize = 70.sp,
             )
         }
         TimePicker(
