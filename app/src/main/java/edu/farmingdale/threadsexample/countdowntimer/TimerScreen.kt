@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -41,7 +42,22 @@ import kotlin.time.Duration.Companion.milliseconds
 fun TimerScreen(
     modifier: Modifier = Modifier,
     timerViewModel: TimerViewModel = viewModel()
+
+
 ) {
+
+    val totalMillis = timerViewModel.totalMillis
+    val remainingMillis = timerViewModel.remainingMillis
+
+    val animatedProgress by animateFloatAsState(
+        targetValue = if (totalMillis > 0) remainingMillis.toFloat() / totalMillis else 1f,
+        animationSpec = tween(
+            durationMillis = 500,
+            easing = LinearEasing
+        )
+    )
+
+    val percentage = (animatedProgress * 100).toInt()
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Box(
             modifier = modifier
@@ -49,13 +65,28 @@ fun TimerScreen(
                 .padding(50.dp),
             contentAlignment = Alignment.Center
         ) {
-            if (timerViewModel.isRunning) {
 
-            }
-            Text(
-                text = timerText(timerViewModel.remainingMillis),
-                fontSize = 70.sp,
-            )
+        }
+        LinearProgressIndicator(
+            progress = animatedProgress,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            color = Color.Blue,
+            trackColor = Color.Gray
+        )
+        Text(
+            text = timerText(remainingMillis),
+            fontSize = 70.sp,
+            modifier = Modifier.padding(top = 16.dp)
+        )
+        Box(
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(50.dp),
+            contentAlignment = Alignment.Center
+        ) {
+
         }
         TimePicker(
             hour = timerViewModel.selectedHour,
@@ -64,6 +95,7 @@ fun TimerScreen(
             onTimePick = timerViewModel::selectTime
         )
         if (timerViewModel.isRunning) {
+
             Button(
                 onClick = timerViewModel::cancelTimer,
                 modifier = modifier.padding(50.dp)
