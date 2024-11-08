@@ -30,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -50,6 +51,7 @@ fun TimerScreen(
     val context = LocalContext.current
     val totalMillis = timerViewModel.totalMillis
     val remainingMillis = timerViewModel.remainingMillis
+
 
     val animatedProgress by animateFloatAsState(
         targetValue = if (totalMillis > 0) remainingMillis.toFloat() / totalMillis else 1f,
@@ -77,10 +79,20 @@ fun TimerScreen(
             color = Color.Blue,
             trackColor = Color.Gray
         )
+
+        val textStyle = if (remainingMillis <= 10000) {
+            MaterialTheme.typography.headlineLarge.copy(
+                color = Color.Red,
+                fontWeight = FontWeight.Bold
+            )
+        } else {
+            MaterialTheme.typography.headlineLarge
+        }
         Text(
             text = timerText(remainingMillis),
             fontSize = 70.sp,
-            modifier = Modifier.padding(top = 16.dp)
+            style = textStyle,
+            modifier = Modifier.padding(top = 16.dp),
         )
         Box(
             modifier = modifier
