@@ -1,5 +1,8 @@
 package edu.farmingdale.threadsexample.countdowntimer
 
+import android.app.Application
+import android.content.Context
+import android.media.MediaPlayer
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
@@ -7,6 +10,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import edu.farmingdale.threadsexample.R
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -15,6 +19,8 @@ import kotlinx.coroutines.withContext
 
 class TimerViewModel : ViewModel() {
     private var timerJob: Job? = null
+    private var mediaPlayer: MediaPlayer? = null
+
 
     // Values selected in time picker
     var selectedHour by mutableIntStateOf(0)
@@ -45,7 +51,7 @@ class TimerViewModel : ViewModel() {
         selectedSecond = sec
     }
 
-    fun startTimer() {
+    fun startTimer(context: Context) {
         totalMillis = (selectedHour * 60 * 60 + selectedMinute * 60 + selectedSecond) * 1000L
 
         if (totalMillis > 0) {
@@ -65,6 +71,12 @@ class TimerViewModel : ViewModel() {
 
                 if (remainingMillis <= 0) {
                     withContext(Dispatchers.Main) {
+                        mediaPlayer = MediaPlayer.create(context, R.raw.ding)
+                        mediaPlayer?.start()
+
+                        mediaPlayer?.setOnCompletionListener {
+                            it.release()
+                        }
                         isRunning = false
                     }
                 }
@@ -90,5 +102,6 @@ class TimerViewModel : ViewModel() {
     override fun onCleared() {
         super.onCleared()
         timerJob?.cancel()
+        mediaPlayer?.release()
     }
 }
