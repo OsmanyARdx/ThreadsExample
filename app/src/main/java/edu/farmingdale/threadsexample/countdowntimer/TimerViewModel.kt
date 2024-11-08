@@ -7,9 +7,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class TimerViewModel : ViewModel() {
     private var timerJob: Job? = null
@@ -34,6 +36,9 @@ class TimerViewModel : ViewModel() {
     var isRunning by mutableStateOf(false)
         private set
 
+    var isPaused by mutableStateOf(false)
+        private set
+
     fun selectTime(hour: Int, min: Int, sec: Int) {
         selectedHour = hour
         selectedMinute = min
@@ -41,24 +46,38 @@ class TimerViewModel : ViewModel() {
     }
 
     fun startTimer() {
-        // Convert hours, minutes, and seconds to milliseconds
         totalMillis = (selectedHour * 60 * 60 + selectedMinute * 60 + selectedSecond) * 1000L
 
-        // Start coroutine that makes the timer count down
         if (totalMillis > 0) {
             isRunning = true
+            isPaused = false
             remainingMillis = totalMillis
 
-            timerJob = viewModelScope.launch {
-                while (remainingMillis > 0) {
-                    delay(1000)
-                    remainingMillis -= 1000
+            timerJob = viewModelScope.launch(Dispatchers.Default) {
+                while (remainingMillis > 0 && isRunning) {
+                    if (!isPaused) {
+                        delay(1000)
+                        remainingMillis -= 1000
+                        withContext(Dispatchers.Main) {
+                        }
+                    }
                 }
 
-                isRunning = false
+                if (remainingMillis <= 0) {
+                    withContext(Dispatchers.Main) {
+                        isRunning = false
+                    }
+                }
             }
         }
     }
+
+    fun pauseOrResumeTimer() {
+        if (isRunning) {
+            isPaused = !isPaused
+        }
+    }
+
 
     fun cancelTimer() {
         if (isRunning) {

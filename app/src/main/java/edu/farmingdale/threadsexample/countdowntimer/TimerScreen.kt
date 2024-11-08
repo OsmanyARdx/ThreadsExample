@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -113,6 +114,17 @@ fun TimerScreen(
                 Text("Start")
             }
         }
+
+
+        Button(onClick = {
+            timerViewModel.pauseOrResumeTimer()
+        }) {
+            Text(
+                text = if (timerViewModel.isPaused) "Continue" else "Pause"
+            )
+        }
+
+
     }
 }
 
